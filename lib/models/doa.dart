@@ -1,0 +1,19 @@
+class DoaItem {
+  final int id;
+  final String judul;
+  final String kategori;
+  final String teksArab;
+  final String teksLatin;
+  final String arti;
+  final String riwayat;
+
+  const DoaItem({
+    required this.id,
+    required this.judul,
+    required this.kategori,
+    required this.teksArab,
+    required this.teksLatin,
+    required this.arti,
+    required this.riwayat,
+  });
+}

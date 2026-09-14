@@ -1,0 +1,142 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:quranmu/main.dart';
+import 'package:quranmu/pages/quran_page.dart';
+import 'package:quranmu/pages/surah_detail_page.dart';
+import 'package:quranmu/pages/qibla_page.dart';
+import 'package:quranmu/pages/settings_page.dart';
+import 'package:quranmu/pages/doa_page.dart';
+import 'package:quranmu/services/prayer_service.dart';
+
+void main() {
+  testWidgets('QuranMu app smoke test', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: QuranMuApp(),
+      ),
+    );
+
+    expect(find.text('QuranMu'), findsOneWidget);
+  });
+
+  testWidgets('QuranPage displays Surah and Juz tabs', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(
+          home: QuranPage(),
+        ),
+      ),
+    );
+
+    expect(find.text('Al-Qur\'an'), findsOneWidget);
+    expect(find.text('Surah (114)'), findsOneWidget);
+    expect(find.text('Juz (30)'), findsOneWidget);
+  });
+
+  testWidgets('SurahDetailPage renders for Al-Fatihah', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(
+          home: SurahDetailPage(surahNomor: 1),
+        ),
+      ),
+    );
+
+    // Initial pump shows loader or title
+    await tester.pump();
+    expect(find.byType(SurahDetailPage), findsOneWidget);
+  });
+
+  test('PrayerService calculates astronomical times and Qibla bearing', () {
+    final now = DateTime(2026, 9, 14, 12, 0);
+    // Jakarta coordinates
+    final service = PrayerService();
+    final data = service.getPrayerTimes(
+      date: now,
+      latitude: -6.2088,
+      longitude: 106.8456,
+      locationName: 'Jakarta',
+    );
+
+    expect(data.locationName, 'Jakarta');
+    expect(data.subuh.hour, 4);
+    expect(data.dzuhur.hour, 11);
+    expect(data.ashar.hour, 15);
+    expect(data.maghrib.hour, 17);
+    expect(data.isya.hour, 19);
+
+    final qibla = service.calculateQibla(-6.2088, 106.8456);
+    // Qibla bearing from Jakarta is approx 295°
+    expect(qibla, greaterThan(290));
+    expect(qibla, lessThan(300));
+  });
+
+  testWidgets('QiblaPage renders compass dial and calibration status', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(
+          home: QiblaPage(),
+        ),
+      ),
+    );
+
+    expect(find.text('Arah Kiblat'), findsOneWidget);
+    expect(find.text('Sudut Derajat Kiblat Ka\'bah'), findsOneWidget);
+  });
+
+  testWidgets('SettingsPage renders font sliders and notification controls', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(
+          home: SettingsPage(),
+        ),
+      ),
+    );
+
+    expect(find.text('Pengaturan'), findsOneWidget);
+    expect(find.text('Tampilan Baca Al-Qur\'an'), findsOneWidget);
+    expect(find.text('Ukuran Font Arab'), findsOneWidget);
+    expect(find.text('Ukuran Font Terjemahan'), findsOneWidget);
+    expect(find.text('Qari Murottal Default'), findsOneWidget);
+
+    // Scroll ke bawah untuk melihat seksi notifikasi & adzan
+    await tester.drag(find.byType(ListView), const Offset(0, -600));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Pilihan Nada / Gaya Adzan'), findsOneWidget);
+    expect(find.text('Adzan Makkah (Merdu & Syahdu)'), findsOneWidget);
+  });
+
+  testWidgets('DoaPage renders prayer categories and search bar', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(
+          home: DoaPage(),
+        ),
+      ),
+    );
+
+    expect(find.text('Doa & Dzikir Harian'), findsOneWidget);
+    expect(find.widgetWithText(FilterChip, 'Semua'), findsOneWidget);
+    expect(find.widgetWithText(FilterChip, 'Harian'), findsOneWidget);
+    expect(find.widgetWithText(FilterChip, 'Ibadah'), findsOneWidget);
+    expect(find.text('Doa Bangun Tidur'), findsOneWidget);
+  });
+
+  testWidgets('SurahDetailPage renders orientation toggle button', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(
+          home: SurahDetailPage(surahNomor: 1),
+        ),
+      ),
+    );
+
+    await tester.pump();
+    expect(find.byTooltip('Mode Lanskap'), findsOneWidget);
+    expect(find.byTooltip('Ganti ke Mode Mushaf'), findsOneWidget);
+  });
+}
+
+

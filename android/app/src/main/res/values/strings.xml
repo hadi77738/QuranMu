@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">QuranMu</string>
+    <string name="widget_name">Ayat Hari Ini (QuranMu)</string>
+    <string name="widget_description">Menampilkan ayat Al-Qur\'an pilihan yang berganti setiap 8 jam.</string>
+</resources>
