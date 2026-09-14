@@ -46,3 +46,10 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# AI Internal Guides & Project Memory (Keep Local Only)
+AGENTS.md
+AI_MASTER_GUIDE.md
+AI_SETUP_GUIDE.md
+PROJECT_MEMORY.md
+
