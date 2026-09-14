@@ -3,6 +3,7 @@
 *.log
 *.pyc
 *.swp
+*.hprof
 .DS_Store
 .atom/
 .build/
@@ -52,4 +53,5 @@ AGENTS.md
 AI_MASTER_GUIDE.md
 AI_SETUP_GUIDE.md
 PROJECT_MEMORY.md
-
+.kotlin/
+android/.kotlin/
