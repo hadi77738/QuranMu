@@ -14,7 +14,7 @@
 * **Application ID / Package Identifier:** `com.quranmu.pacman`
 * **Tujuan Utama:** Aplikasi Android Islami (Offline-first) untuk membaca Al-Qur'an (Mushaf & Terjemahan+Tafsir), fitur Murottal Audio, jadwal sholat, adzan, ayat hari ini rotasi 8 jam, dan widget homescreen 4x2.
 * **Target Pengguna:** Mobile users (Android)
-* **Repository / Lingkungan:** Lokal
+* **Repository / Lingkungan:** [https://github.com/hadi77738/QuranMu](https://github.com/hadi77738/QuranMu)
 
 ---
 
