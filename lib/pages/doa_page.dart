@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../data/doa_data.dart';
 import '../models/doa.dart';
 import '../theme/app_theme.dart';
+import 'tahlil_page.dart';
 
 class DoaPage extends ConsumerStatefulWidget {
   const DoaPage({super.key});
@@ -17,7 +19,15 @@ class _DoaPageState extends ConsumerState<DoaPage> {
   String _selectedCategory = 'Semua';
   final TextEditingController _searchController = TextEditingController();
 
-  final List<String> _categories = ['Semua', 'Harian', 'Ibadah', 'Perjalanan', 'Dzikir'];
+  final List<String> _categories = [
+    'Semua',
+    'Setelah Sholat',
+    'Tahlil',
+    'Harian',
+    'Ibadah',
+    'Perjalanan',
+    'Dzikir',
+  ];
 
   @override
   void dispose() {
@@ -49,14 +59,16 @@ class _DoaPageState extends ConsumerState<DoaPage> {
             // Search Bar & Filter Header
             Container(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-              color: Colors.white,
+              color: AppColors.surface(context),
               child: Column(
                 children: [
                   TextField(
                     controller: _searchController,
                     onChanged: (val) => setState(() => _searchQuery = val),
+                    style: TextStyle(color: AppColors.text(context)),
                     decoration: InputDecoration(
-                      hintText: 'Cari doa atau arti...',
+                      hintText: 'Cari doa, tahlil, arti...',
+                      hintStyle: TextStyle(color: AppColors.mutedText(context)),
                       prefixIcon: const Icon(Icons.search_rounded, color: AppColors.primary),
                       suffixIcon: _searchQuery.isNotEmpty
                           ? IconButton(
@@ -68,15 +80,15 @@ class _DoaPageState extends ConsumerState<DoaPage> {
                             )
                           : null,
                       filled: true,
-                      fillColor: const Color(0xFFF6F8F7),
+                      fillColor: AppColors.background(context),
                       contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: AppColors.cardBorderLight),
+                        borderSide: BorderSide(color: AppColors.cardBorder(context)),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: AppColors.cardBorderLight),
+                        borderSide: BorderSide(color: AppColors.cardBorder(context)),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
@@ -99,17 +111,17 @@ class _DoaPageState extends ConsumerState<DoaPage> {
                             onSelected: (val) {
                               setState(() => _selectedCategory = cat);
                             },
-                            backgroundColor: Colors.white,
+                            backgroundColor: AppColors.surface(context),
                             selectedColor: AppColors.primaryContainer,
                             labelStyle: TextStyle(
                               fontSize: 12,
                               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                              color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                              color: isSelected ? (AppColors.isDark(context) ? AppColors.secondary : AppColors.primary) : AppColors.subText(context),
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                               side: BorderSide(
-                                color: isSelected ? AppColors.primary : AppColors.cardBorderLight,
+                                color: isSelected ? AppColors.primary : AppColors.cardBorder(context),
                               ),
                             ),
                             showCheckmark: false,
@@ -121,7 +133,7 @@ class _DoaPageState extends ConsumerState<DoaPage> {
                 ],
               ),
             ),
-            const Divider(height: 1, color: AppColors.cardBorderLight),
+            Divider(height: 1, color: AppColors.cardBorder(context)),
 
             // List of Doa
             Expanded(
@@ -130,23 +142,34 @@ class _DoaPageState extends ConsumerState<DoaPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.search_off_rounded, size: 56, color: Colors.grey.shade400),
+                          Icon(Icons.search_off_rounded, size: 56, color: AppColors.mutedText(context)),
                           const SizedBox(height: 12),
-                          const Text(
+                          Text(
                             'Doa tidak ditemukan',
-                            style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                            style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.subText(context)),
                           ),
                         ],
                       ),
                     )
-                  : ListView.builder(
+                  : ListView(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       physics: const BouncingScrollPhysics(),
-                      itemCount: filteredList.length,
-                      itemBuilder: (context, index) {
-                        final doa = filteredList[index];
-                        return _buildDoaCard(context, doa);
-                      },
+                      children: [
+                        // Quick Action Banners when not searching
+                        if (_searchQuery.isEmpty && _selectedCategory == 'Semua')
+                          _buildQuickFeaturedBanners(context),
+
+                        // Special Banner for Tahlil category
+                        if (_selectedCategory == 'Tahlil')
+                          _buildTahlilHeaderBanner(context),
+
+                        // Special Banner for Setelah Sholat category
+                        if (_selectedCategory == 'Setelah Sholat')
+                          _buildSetelahSholatHeaderBanner(context),
+
+                        // Doa Cards
+                        ...filteredList.map((doa) => _buildDoaCard(context, doa)),
+                      ],
                     ),
             ),
           ],
@@ -155,16 +178,231 @@ class _DoaPageState extends ConsumerState<DoaPage> {
     );
   }
 
+  Widget _buildQuickFeaturedBanners(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        children: [
+          Expanded(
+            child: InkWell(
+              onTap: () => setState(() => _selectedCategory = 'Setelah Sholat'),
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.surface(context),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.05),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryContainer,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(Icons.mosque_rounded, color: AppColors.primary, size: 20),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Doa Ba\'da Sholat',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.text(context),
+                            ),
+                          ),
+                          Text(
+                            'Lengkap 12 Poin',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: AppColors.subText(context),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: InkWell(
+              onTap: () => context.push('/tahlil'),
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.surface(context),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.secondary.withValues(alpha: 0.3)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.secondary.withValues(alpha: 0.05),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.secondary.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(Icons.auto_stories_rounded, color: AppColors.secondary, size: 20),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Bacaan Tahlil',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.text(context),
+                            ),
+                          ),
+                          Text(
+                            '17 Urutan & Arwah',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: AppColors.subText(context),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTahlilHeaderBanner(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: AppColors.isDark(context)
+              ? [const Color(0xFF132A24), const Color(0xFF0F1E1A)]
+              : [const Color(0xFFE2F3ED), const Color(0xFFCEECE1)],
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.menu_book_rounded, color: Colors.white, size: 22),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Panduan Tahlil (17 Urutan)',
+                  style: TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.text(context),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Buka mode langkah berurutan lengkap dengan tasbih digital.',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    color: AppColors.subText(context),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          FilledButton(
+            onPressed: () => context.push('/tahlil'),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: const Text('Buka', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSetelahSholatHeaderBanner(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.isDark(context)
+            ? AppColors.primary.withValues(alpha: 0.15)
+            : AppColors.primaryContainer.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.verified_rounded, color: AppColors.primary, size: 24),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Doa Ma\'tsur sesudah sholat fardhu lengkap dengan sanad puji-pujian, keselamatan agama, dan ampunan kubur.',
+              style: TextStyle(
+                fontSize: 12,
+                height: 1.4,
+                color: AppColors.text(context),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildDoaCard(BuildContext context, DoaItem doa) {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.cardBorderLight),
+        border: Border.all(color: AppColors.cardBorder(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: Colors.black.withValues(alpha: AppColors.isDark(context) ? 0.2 : 0.02),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -177,7 +415,9 @@ class _DoaPageState extends ConsumerState<DoaPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: AppColors.primaryContainer.withValues(alpha: 0.4),
+              color: AppColors.isDark(context)
+                  ? AppColors.primary.withValues(alpha: 0.15)
+                  : AppColors.primaryContainer.withValues(alpha: 0.4),
               borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
             ),
             child: Row(
@@ -193,17 +433,48 @@ class _DoaPageState extends ConsumerState<DoaPage> {
                     style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                   ),
                 ),
+                if (doa.count != null) ...[
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: AppColors.secondary.withValues(alpha: 0.18),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      '${doa.count}x',
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.isDark(context) ? AppColors.secondary : const Color(0xFF9E6400),
+                      ),
+                    ),
+                  ),
+                ],
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     doa.judul,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 15,
-                      color: AppColors.textPrimary,
+                      color: AppColors.text(context),
                     ),
                   ),
                 ),
+                if (doa.kategori == 'Tahlil')
+                  IconButton(
+                    icon: const Icon(Icons.fullscreen_rounded, size: 20, color: AppColors.secondary),
+                    tooltip: 'Buka di Mode Tahlil',
+                    visualDensity: VisualDensity.compact,
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => TahlilPage(initialStep: (doa.urutan ?? 1) - 1),
+                        ),
+                      );
+                    },
+                  ),
                 IconButton(
                   icon: const Icon(Icons.copy_rounded, size: 18, color: AppColors.primary),
                   tooltip: 'Salin Doa',
@@ -211,7 +482,7 @@ class _DoaPageState extends ConsumerState<DoaPage> {
                   onPressed: () {
                     Clipboard.setData(
                       ClipboardData(
-                        text: '${doa.judul}\n\n${doa.teksArab}\n\n"${doa.arti}"\n\n(${doa.riwayat})',
+                        text: '${doa.judul}\n\n${doa.teksArab}\n\n${doa.teksLatin}\n\n"${doa.arti}"\n\n(${doa.riwayat})',
                       ),
                     );
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -235,11 +506,11 @@ class _DoaPageState extends ConsumerState<DoaPage> {
                 // Teks Arab
                 Text(
                   doa.teksArab,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w600,
                     height: 2.0,
-                    color: Color(0xFF1B2A26),
+                    color: AppColors.arabic(context),
                   ),
                   textAlign: TextAlign.right,
                   textDirection: TextDirection.rtl,
@@ -261,9 +532,9 @@ class _DoaPageState extends ConsumerState<DoaPage> {
                 // Terjemahan
                 Text(
                   doa.arti,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13.5,
-                    color: AppColors.textPrimary,
+                    color: AppColors.text(context),
                     height: 1.5,
                   ),
                 ),
@@ -273,9 +544,9 @@ class _DoaPageState extends ConsumerState<DoaPage> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF9FBFB),
+                    color: AppColors.background(context),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppColors.cardBorderLight),
+                    border: Border.all(color: AppColors.cardBorder(context)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -285,10 +556,10 @@ class _DoaPageState extends ConsumerState<DoaPage> {
                       Flexible(
                         child: Text(
                           doa.riwayat,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textSecondary,
+                            color: AppColors.subText(context),
                           ),
                         ),
                       ),

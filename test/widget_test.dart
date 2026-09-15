@@ -7,8 +7,10 @@ import 'package:quranmu/pages/surah_detail_page.dart';
 import 'package:quranmu/pages/qibla_page.dart';
 import 'package:quranmu/pages/settings_page.dart';
 import 'package:quranmu/pages/doa_page.dart';
+import 'package:quranmu/pages/tahlil_page.dart';
 import 'package:quranmu/pages/juz_detail_page.dart';
 import 'package:quranmu/data/juz_data.dart';
+import 'package:quranmu/data/doa_data.dart';
 import 'package:quranmu/services/prayer_service.dart';
 
 void main() {
@@ -167,6 +169,55 @@ void main() {
       expect(juz.startAyat, greaterThanOrEqualTo(1));
       expect(juz.endAyat, greaterThanOrEqualTo(1));
     }
+  });
+
+  test('Doa Setelah Sholat and 17 Tahlil items integrity', () {
+    final doaSholat = DoaData.doaSetelahSholat;
+    expect(doaSholat.judul, 'Doa Setelah Selesai Sholat Fardhu');
+    expect(doaSholat.kategori, 'Setelah Sholat');
+    expect(doaSholat.teksArab, contains('اَلْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِيْنَ'));
+
+    final listTahlil = DoaData.listTahlil;
+    expect(listTahlil.length, 17);
+    expect(listTahlil.first.urutan, 1);
+    expect(listTahlil.first.judul, contains('Tawasul'));
+    expect(listTahlil.last.urutan, 17);
+    expect(listTahlil.last.judul, contains('Penutup'));
+
+    // Check Doa Arwah is at #16
+    final doaArwah = listTahlil[15];
+    expect(doaArwah.urutan, 16);
+    expect(doaArwah.judul, contains('Doa Tahlil'));
+    expect(doaArwah.teksArab, contains('ثُمَّ إِلَى أَرْوَاحِ جَمِيْعِ أَهْلِ الْقُبُوْرِ'));
+  });
+
+  testWidgets('TahlilPage renders and operates digital tasbih counter', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: TahlilPage(),
+      ),
+    );
+
+    expect(find.text('Susunan Bacaan Tahlil'), findsOneWidget);
+    expect(find.text('Urutan 1 dari 17'), findsOneWidget);
+    expect(find.text('1. Pengantar Al-Fatihah (Tawasul)'), findsOneWidget);
+
+    // Tap next to step 2 (Al-Fatihah)
+    await tester.tap(find.text('Langkah Lanjut'));
+    await tester.pumpAndSettle();
+    expect(find.text('Urutan 2 dari 17'), findsOneWidget);
+
+    // Tap next to step 3 (Al-Ikhlas 3x)
+    await tester.tap(find.text('Langkah Lanjut'));
+    await tester.pumpAndSettle();
+    expect(find.text('Urutan 3 dari 17'), findsOneWidget);
+    expect(find.text('Dibaca 3x'), findsWidgets);
+
+    // Digital tasbih counter button exists
+    expect(find.text('Ketuk Penghitung: 0 / 3'), findsOneWidget);
+    await tester.tap(find.text('Ketuk Penghitung: 0 / 3'));
+    await tester.pumpAndSettle();
+    expect(find.text('Ketuk Penghitung: 1 / 3'), findsOneWidget);
   });
 }
 

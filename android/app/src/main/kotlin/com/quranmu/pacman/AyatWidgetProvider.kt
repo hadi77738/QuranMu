@@ -84,6 +84,36 @@ class AyatWidgetProvider : AppWidgetProvider() {
 
                 val views = RemoteViews(context.packageName, R.layout.ayat_widget_layout)
 
+                // Baca preferensi tema dari Flutter SharedPreferences
+                val prefs = context.getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
+                val themeMode = prefs.getString("flutter.setting_theme_mode", "light") ?: "light"
+
+                val isDark = when (themeMode) {
+                    "dark" -> true
+                    "system" -> {
+                        val nightModeFlags = context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+                        nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES
+                    }
+                    else -> false
+                }
+
+                // Sesuaikan warna dan background kartu widget sesuai tema
+                if (isDark) {
+                    views.setInt(R.id.widget_root, "setBackgroundResource", R.drawable.widget_card_bg_dark)
+                    views.setTextColor(R.id.widget_app_title, android.graphics.Color.parseColor("#10B981"))
+                    views.setTextColor(R.id.widget_ayat_arabic, android.graphics.Color.parseColor("#E0F2F1"))
+                    views.setTextColor(R.id.widget_ayat_translation, android.graphics.Color.parseColor("#CFD8DC"))
+                    views.setTextColor(R.id.widget_ayat_period, android.graphics.Color.parseColor("#4DB6AC"))
+                    views.setTextColor(R.id.widget_action_text, android.graphics.Color.parseColor("#80CBC4"))
+                } else {
+                    views.setInt(R.id.widget_root, "setBackgroundResource", R.drawable.widget_card_bg)
+                    views.setTextColor(R.id.widget_app_title, android.graphics.Color.parseColor("#074633"))
+                    views.setTextColor(R.id.widget_ayat_arabic, android.graphics.Color.parseColor("#064E3B"))
+                    views.setTextColor(R.id.widget_ayat_translation, android.graphics.Color.parseColor("#334155"))
+                    views.setTextColor(R.id.widget_ayat_period, android.graphics.Color.parseColor("#00796B"))
+                    views.setTextColor(R.id.widget_action_text, android.graphics.Color.parseColor("#0D9488"))
+                }
+
                 views.setTextViewText(R.id.widget_surah_ref, "QS. ${verse.surahNama}: ${verse.ayatNomor}")
                 views.setTextViewText(R.id.widget_ayat_arabic, verse.teksArab)
                 views.setTextViewText(R.id.widget_ayat_translation, "\"${verse.terjemahan}\"")

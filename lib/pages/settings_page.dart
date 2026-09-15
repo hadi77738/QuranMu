@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/settings_service.dart';
-import '../services/notification_service.dart';
 import '../services/audio_service.dart';
 import '../theme/app_theme.dart';
 
@@ -25,10 +24,17 @@ class SettingsPage extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
           physics: const BouncingScrollPhysics(),
           children: [
-            // SEKSI 1: TAMPILAN BACA AL-QUR'AN
+            // SEKSI 1: TEMA TAMPILAN
+            _buildSectionHeader(context, icon: Icons.palette_rounded, title: 'Tema & Tampilan'),
+            const SizedBox(height: 10),
+            _buildThemeSelector(context, settings, notifier),
+            const SizedBox(height: 24),
+
+            // SEKSI 2: TAMPILAN BACA AL-QUR'AN
             _buildSectionHeader(context, icon: Icons.menu_book_rounded, title: 'Tampilan Baca Al-Qur\'an'),
             const SizedBox(height: 10),
             _buildCard(
+              context,
               children: [
                 // Slider Ukuran Font Arab
                 Padding(
@@ -42,7 +48,10 @@ class SettingsPage extends ConsumerWidget {
                       ),
                       Text(
                         '${settings.arabicFontSize.toInt()} pt',
-                        style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.primary),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary,
+                        ),
                       ),
                     ],
                   ),
@@ -52,7 +61,7 @@ class SettingsPage extends ConsumerWidget {
                   min: 18.0,
                   max: 36.0,
                   divisions: 9,
-                  activeColor: AppColors.primary,
+                  activeColor: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary,
                   onChanged: (val) => notifier.setArabicFontSize(val),
                 ),
                 // Live Preview Teks Arab
@@ -60,9 +69,9 @@ class SettingsPage extends ConsumerWidget {
                   margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF9FBFB),
+                    color: AppColors.isDark(context) ? const Color(0xFF0F1A17) : const Color(0xFFF9FBFB),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.cardBorderLight),
+                    border: Border.all(color: AppColors.cardBorder(context)),
                   ),
                   child: Center(
                     child: Text(
@@ -70,14 +79,14 @@ class SettingsPage extends ConsumerWidget {
                       style: TextStyle(
                         fontSize: settings.arabicFontSize,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF1B2A26),
+                        color: AppColors.arabic(context),
                       ),
                       textDirection: TextDirection.rtl,
                     ),
                   ),
                 ),
                 const SizedBox(height: 12),
-                const Divider(height: 1, color: AppColors.cardBorderLight),
+                Divider(height: 1, color: AppColors.cardBorder(context)),
 
                 // Slider Ukuran Font Terjemahan
                 Padding(
@@ -91,7 +100,10 @@ class SettingsPage extends ConsumerWidget {
                       ),
                       Text(
                         '${settings.translationFontSize.toInt()} pt',
-                        style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.primary),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary,
+                        ),
                       ),
                     ],
                   ),
@@ -101,7 +113,7 @@ class SettingsPage extends ConsumerWidget {
                   min: 12.0,
                   max: 20.0,
                   divisions: 8,
-                  activeColor: AppColors.primary,
+                  activeColor: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary,
                   onChanged: (val) => notifier.setTranslationFontSize(val),
                 ),
                 // Live Preview Terjemahan
@@ -109,20 +121,36 @@ class SettingsPage extends ConsumerWidget {
                   margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF9FBFB),
+                    color: AppColors.isDark(context) ? const Color(0xFF0F1A17) : const Color(0xFFF9FBFB),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.cardBorderLight),
+                    border: Border.all(color: AppColors.cardBorder(context)),
                   ),
                   child: Text(
                     'Dengan nama Allah Yang Maha Pengasih, Maha Penyayang.',
                     style: TextStyle(
                       fontSize: settings.translationFontSize,
-                      color: AppColors.textPrimary,
+                      color: AppColors.text(context),
                     ),
                   ),
                 ),
                 const SizedBox(height: 12),
-                const Divider(height: 1, color: AppColors.cardBorderLight),
+                Divider(height: 1, color: AppColors.cardBorder(context)),
+
+                // Switch Garis Penuntun Mushaf (Mushaf Bergaris)
+                SwitchListTile.adaptive(
+                  value: settings.showMushafLines,
+                  activeTrackColor: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary,
+                  title: const Text(
+                    'Garis Penuntun Mode Mushaf',
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                  ),
+                  subtitle: Text(
+                    'Garis penuntun di bawah baris ayat (Mushaf Bergaris Standar Indonesia)',
+                    style: TextStyle(fontSize: 12, color: AppColors.subText(context)),
+                  ),
+                  onChanged: (val) => notifier.setMushafLines(val),
+                ),
+                Divider(height: 1, color: AppColors.cardBorder(context)),
 
                 // Pilihan Qari Murottal
                 Padding(
@@ -138,15 +166,19 @@ class SettingsPage extends ConsumerWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF6F8F7),
+                          color: AppColors.isDark(context) ? const Color(0xFF0F1A17) : const Color(0xFFF6F8F7),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.cardBorderLight),
+                          border: Border.all(color: AppColors.cardBorder(context)),
                         ),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
                             isExpanded: true,
                             value: settings.qariId,
-                            icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.primary),
+                            dropdownColor: AppColors.surface(context),
+                            icon: Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              color: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary,
+                            ),
                             items: const [
                               DropdownMenuItem(
                                 value: '05',
@@ -189,10 +221,11 @@ class SettingsPage extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
 
-            // SEKSI 2: PENGINGAT WAKTU SHOLAT & ADZAN
+            // SEKSI 3: PENGINGAT WAKTU SHOLAT & ADZAN
             _buildSectionHeader(context, icon: Icons.notifications_active_rounded, title: 'Notifikasi Jadwal Sholat'),
             const SizedBox(height: 10),
             _buildCard(
+              context,
               children: [
                 SwitchListTile.adaptive(
                   title: const Text(
@@ -201,11 +234,11 @@ class SettingsPage extends ConsumerWidget {
                   ),
                   subtitle: const Text('Bunyikan notifikasi saat waktu sholat tiba'),
                   value: settings.enableAdzanNotification,
-                  activeTrackColor: AppColors.primary,
+                  activeTrackColor: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary,
                   onChanged: (val) => notifier.toggleAdzanNotification(val),
                 ),
                 if (settings.enableAdzanNotification) ...[
-                  const Divider(height: 1, color: AppColors.cardBorderLight),
+                  Divider(height: 1, color: AppColors.cardBorder(context)),
                   // PILIHAN NADA / GAYA ADZAN
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
@@ -214,18 +247,18 @@ class SettingsPage extends ConsumerWidget {
                       children: [
                         Row(
                           children: [
-                            const Expanded(
+                            Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  const Text(
                                     'Pilihan Nada / Gaya Adzan',
                                     style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
                                   ),
-                                  SizedBox(height: 2),
+                                  const SizedBox(height: 2),
                                   Text(
                                     'Pilih suara kumandang adzan saat waktu sholat tiba',
-                                    style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                                    style: TextStyle(fontSize: 12, color: AppColors.subText(context)),
                                   ),
                                 ],
                               ),
@@ -238,7 +271,7 @@ class SettingsPage extends ConsumerWidget {
                                         ref.watch(audioPlayerProvider).currentTitle == settings.adzanSoundName
                                     ? Icons.stop_rounded
                                     : Icons.play_arrow_rounded,
-                                color: AppColors.primary,
+                                color: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary,
                               ),
                               onPressed: () {
                                 final audioState = ref.read(audioPlayerProvider);
@@ -266,21 +299,22 @@ class SettingsPage extends ConsumerWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 14),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.cardBorderLight),
-                            color: const Color(0xFFF9FBFA),
+                            border: Border.all(color: AppColors.cardBorder(context)),
+                            color: AppColors.isDark(context) ? const Color(0xFF0F1A17) : const Color(0xFFF9FBFA),
                           ),
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
                               isExpanded: true,
                               value: settings.adzanSound,
-                              items: const [
+                              dropdownColor: AppColors.surface(context),
+                              items: [
                                 DropdownMenuItem(
                                   value: 'adzan_makkah',
                                   child: Row(
                                     children: [
-                                      Icon(Icons.mosque_rounded, size: 18, color: AppColors.primary),
-                                      SizedBox(width: 8),
-                                      Text('Adzan Makkah (Merdu & Syahdu)'),
+                                      Icon(Icons.mosque_rounded, size: 18, color: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary),
+                                      const SizedBox(width: 8),
+                                      const Text('Adzan Makkah (Merdu & Syahdu)'),
                                     ],
                                   ),
                                 ),
@@ -288,9 +322,9 @@ class SettingsPage extends ConsumerWidget {
                                   value: 'adzan_madinah',
                                   child: Row(
                                     children: [
-                                      Icon(Icons.mosque_outlined, size: 18, color: AppColors.primary),
-                                      SizedBox(width: 8),
-                                      Text('Adzan Madinah (Khusyuk)'),
+                                      Icon(Icons.mosque_outlined, size: 18, color: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary),
+                                      const SizedBox(width: 8),
+                                      const Text('Adzan Madinah (Khusyuk)'),
                                     ],
                                   ),
                                 ),
@@ -298,19 +332,19 @@ class SettingsPage extends ConsumerWidget {
                                   value: 'adzan_mesir',
                                   child: Row(
                                     children: [
-                                      Icon(Icons.spatial_audio_rounded, size: 18, color: AppColors.primary),
-                                      SizedBox(width: 8),
-                                      Text('Adzan Mesir / Cairo (Klasik)'),
+                                      Icon(Icons.spatial_audio_rounded, size: 18, color: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary),
+                                      const SizedBox(width: 8),
+                                      const Text('Adzan Mesir / Cairo (Klasik)'),
                                     ],
                                   ),
                                 ),
-                                DropdownMenuItem(
+                                const DropdownMenuItem(
                                   value: 'default',
                                   child: Row(
                                     children: [
-                                      Icon(Icons.notifications_rounded, size: 18, color: AppColors.textSecondary),
+                                      Icon(Icons.notifications_rounded, size: 18, color: Colors.blueGrey),
                                       SizedBox(width: 8),
-                                      Text('Suara Bawaan Sistem HP'),
+                                      Text('Nada Dering Bawaan HP (Default)'),
                                     ],
                                   ),
                                 ),
@@ -320,7 +354,7 @@ class SettingsPage extends ConsumerWidget {
                                   String name = 'Adzan Makkah (Merdu & Syahdu)';
                                   if (val == 'adzan_madinah') name = 'Adzan Madinah (Khusyuk)';
                                   if (val == 'adzan_mesir') name = 'Adzan Mesir / Cairo (Klasik)';
-                                  if (val == 'default') name = 'Suara Bawaan Sistem HP';
+                                  if (val == 'default') name = 'Nada Dering Bawaan HP';
                                   notifier.setAdzanSound(val, name);
                                 }
                               },
@@ -330,72 +364,96 @@ class SettingsPage extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  const Divider(height: 1, color: AppColors.cardBorderLight),
+                  Divider(height: 1, color: AppColors.cardBorder(context)),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                    child: Text(
+                      'Pilih Waktu Sholat yang Diingatkan:',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.subText(context),
+                      ),
+                    ),
+                  ),
                   _buildPrayerCheckTile(
+                    context,
                     title: 'Subuh',
                     value: settings.alertSubuh,
                     onChanged: (val) => notifier.togglePrayerAlert('Subuh', val),
                   ),
                   _buildPrayerCheckTile(
+                    context,
                     title: 'Dzuhur',
                     value: settings.alertDzuhur,
                     onChanged: (val) => notifier.togglePrayerAlert('Dzuhur', val),
                   ),
                   _buildPrayerCheckTile(
+                    context,
                     title: 'Ashar',
                     value: settings.alertAshar,
                     onChanged: (val) => notifier.togglePrayerAlert('Ashar', val),
                   ),
                   _buildPrayerCheckTile(
+                    context,
                     title: 'Maghrib',
                     value: settings.alertMaghrib,
                     onChanged: (val) => notifier.togglePrayerAlert('Maghrib', val),
                   ),
                   _buildPrayerCheckTile(
+                    context,
                     title: 'Isya',
                     value: settings.alertIsya,
                     onChanged: (val) => notifier.togglePrayerAlert('Isya', val),
                   ),
-                  const Divider(height: 1, color: AppColors.cardBorderLight),
+                  Divider(height: 1, color: AppColors.cardBorder(context)),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
                     child: OutlinedButton.icon(
+                      icon: Icon(Icons.notifications_active_outlined, size: 18, color: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary),
+                      label: Text(
+                        'Uji Alarm Notifikasi Adzan (5 Detik)',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary,
+                        ),
+                      ),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.primary,
-                        side: const BorderSide(color: AppColors.primary),
+                        side: BorderSide(
+                          color: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary,
+                        ),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
-                      icon: const Icon(Icons.volume_up_rounded, size: 20),
-                      label: const Text('Tes Notifikasi Adzan Sekarang'),
                       onPressed: () async {
-                        final notifService = NotificationService();
-                        final granted = await notifService.requestPermission();
-                        if (!granted && context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Izin notifikasi belum diaktifkan di sistem HP. Silakan aktifkan izin notifikasi untuk QuranMu di Pengaturan HP Anda.'),
-                              backgroundColor: Colors.deepOrange,
-                              duration: Duration(seconds: 4),
-                            ),
-                          );
-                          return;
-                        }
-
-                        await notifService.showNotification(
-                          id: 999,
-                          title: 'Waktu Sholat Telah Tiba',
-                          body: 'Panggilan adzan (${settings.adzanSoundName}) telah berkumandang. Mari tunaikan sholat.',
-                          soundName: settings.adzanSound,
-                        );
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Notifikasi tes berhasil dikirim (${settings.adzanSoundName})! Silakan periksa bilah notifikasi HP Anda.'),
-                              duration: const Duration(seconds: 3),
-                              backgroundColor: AppColors.primary,
-                            ),
-                          );
+                        final testTime = DateTime.now().add(const Duration(seconds: 5));
+                        try {
+                          await ref.read(settingsProvider.notifier).scheduleTestAlarm(
+                                id: 999,
+                                title: 'Waktu Sholat Telah Tiba',
+                                body: 'Allahu Akbar, Allahu Akbar! Waktunya sholat (${settings.adzanSoundName})',
+                                scheduledTime: testTime,
+                                soundFile: settings.adzanSound != 'default' ? settings.adzanSound : null,
+                              );
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Tes alarm dijadwalkan dalam 5 detik (${settings.adzanSoundName}). Kunci HP atau tunggu notifikasi berbunyi!'),
+                                duration: const Duration(seconds: 4),
+                                backgroundColor: AppColors.primary,
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Gagal menjadwalkan tes: $e'),
+                                backgroundColor: Colors.redAccent,
+                              ),
+                            );
+                          }
                         }
                       },
                     ),
@@ -405,42 +463,43 @@ class SettingsPage extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
 
-            // SEKSI 3: TENTANG APLIKASI
+            // SEKSI 4: TENTANG APLIKASI
             _buildSectionHeader(context, icon: Icons.info_outline_rounded, title: 'Tentang Aplikasi'),
             const SizedBox(height: 10),
             _buildCard(
+              context,
               children: [
                 ListTile(
-                  leading: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryContainer,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(Icons.auto_stories_rounded, color: AppColors.primary, size: 20),
+                  leading: Icon(
+                    Icons.verified_rounded,
+                    color: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary,
                   ),
-                  title: const Text('QuranMu', style: TextStyle(fontWeight: FontWeight.w700)),
-                  subtitle: const Text('Aplikasi Al-Qur\'an & Teman Ibadah Harian'),
+                  title: const Text('Versi Aplikasi', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                  subtitle: const Text('QuranMu - Al-Qur\'an & Teman Ibadah'),
                   trailing: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F3),
+                      color: AppColors.isDark(context) ? const Color(0xFF0F1A17) : const Color(0xFFF1F5F3),
                       borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.cardBorder(context)),
                     ),
-                    child: const Text('v1.0.0', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+                    child: const Text('v1.0.1', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
                   ),
                 ),
-                const Divider(height: 1, color: AppColors.cardBorderLight),
+                Divider(height: 1, color: AppColors.cardBorder(context)),
                 const ListTile(
                   leading: Icon(Icons.offline_bolt_rounded, color: AppColors.secondary),
                   title: Text('Mode Offline-First', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                   subtitle: Text('Data Al-Qur\'an, hisab jadwal sholat, dan doa tersimpan di perangkat'),
                 ),
-                const Divider(height: 1, color: AppColors.cardBorderLight),
-                const ListTile(
-                  leading: Icon(Icons.verified_user_outlined, color: AppColors.primary),
-                  title: Text('Standar Data Kemenag RI', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                  subtitle: Text('Teks Mushaf Standar Indonesia, Terjemahan & Tafsir Resmi Kemenag RI'),
+                Divider(height: 1, color: AppColors.cardBorder(context)),
+                ListTile(
+                  leading: Icon(
+                    Icons.verified_user_outlined,
+                    color: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary,
+                  ),
+                  title: const Text('Standar Data Kemenag RI', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                  subtitle: const Text('Teks Mushaf Standar Indonesia, Terjemahan & Tafsir Resmi Kemenag RI'),
                 ),
               ],
             ),
@@ -451,17 +510,141 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
+  Widget _buildThemeSelector(BuildContext context, AppSettings settings, SettingsNotifier notifier) {
+    return _buildCard(
+      context,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Pilihan Tema',
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: (AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary).withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      'App & Widget',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Sesuaikan nuansa tampilan aplikasi dan widget homescreen sesuai kenyamanan Anda.',
+                style: TextStyle(fontSize: 12, color: AppColors.subText(context)),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  _buildThemeOption(
+                    context: context,
+                    icon: Icons.light_mode_rounded,
+                    label: 'Terang',
+                    isSelected: settings.themeMode == AppThemeMode.light,
+                    onTap: () => notifier.setThemeMode(AppThemeMode.light),
+                  ),
+                  const SizedBox(width: 10),
+                  _buildThemeOption(
+                    context: context,
+                    icon: Icons.dark_mode_rounded,
+                    label: 'Gelap',
+                    isSelected: settings.themeMode == AppThemeMode.dark,
+                    onTap: () => notifier.setThemeMode(AppThemeMode.dark),
+                  ),
+                  const SizedBox(width: 10),
+                  _buildThemeOption(
+                    context: context,
+                    icon: Icons.brightness_auto_rounded,
+                    label: 'Sistem',
+                    isSelected: settings.themeMode == AppThemeMode.system,
+                    onTap: () => notifier.setThemeMode(AppThemeMode.system),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildThemeOption({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    final activeColor = AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary;
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? activeColor.withValues(alpha: 0.14)
+                : AppColors.isDark(context)
+                    ? const Color(0xFF0E1815)
+                    : const Color(0xFFF7FAF8),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isSelected ? activeColor : AppColors.cardBorder(context),
+              width: isSelected ? 2.0 : 1.0,
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                color: isSelected ? activeColor : AppColors.mutedText(context),
+                size: 24,
+              ),
+              const SizedBox(height: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color: isSelected ? activeColor : AppColors.text(context),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildSectionHeader(BuildContext context, {required IconData icon, required String title}) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: AppColors.primary),
+        Icon(icon, size: 18, color: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary),
         const SizedBox(width: 8),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w700,
-            color: AppColors.textSecondary,
+            color: AppColors.subText(context),
             letterSpacing: 0.2,
           ),
         ),
@@ -469,21 +652,21 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildCard({required List<Widget> children}) {
+  Widget _buildCard(BuildContext context, {required List<Widget> children}) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.cardBorderLight),
+        border: Border.all(color: AppColors.cardBorder(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: Colors.black.withValues(alpha: AppColors.isDark(context) ? 0.2 : 0.02),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Material(
-        color: Colors.white,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(18),
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -494,7 +677,8 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildPrayerCheckTile({
+  Widget _buildPrayerCheckTile(
+    BuildContext context, {
     required String title,
     required bool value,
     required ValueChanged<bool> onChanged,
@@ -502,7 +686,7 @@ class SettingsPage extends ConsumerWidget {
     return CheckboxListTile.adaptive(
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
       value: value,
-      activeColor: AppColors.primary,
+      activeColor: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary,
       dense: true,
       onChanged: (val) => onChanged(val ?? true),
     );

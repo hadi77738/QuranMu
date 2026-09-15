@@ -102,12 +102,12 @@ class _HomePageState extends ConsumerState<HomePage> {
               ],
             ),
             const SizedBox(height: 4),
-            const Text(
+            Text(
               'QuranMu',
               style: TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
+                color: AppColors.text(context),
                 letterSpacing: -0.5,
               ),
             ),
@@ -115,12 +115,12 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface(context),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.cardBorderLight),
+            border: Border.all(color: AppColors.cardBorder(context)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
+                color: Colors.black.withValues(alpha: AppColors.isDark(context) ? 0.2 : 0.04),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -340,12 +340,12 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.cardBorderLight),
+        border: Border.all(color: AppColors.cardBorder(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: Colors.black.withValues(alpha: AppColors.isDark(context) ? 0.2 : 0.03),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -358,31 +358,35 @@ class _HomePageState extends ConsumerState<HomePage> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: AppColors.primaryContainer,
+              color: AppColors.isDark(context) ? const Color(0xFF0D4738) : AppColors.primaryContainer,
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Icon(Icons.bookmark_rounded, color: AppColors.primary, size: 26),
+            child: Icon(
+              Icons.bookmark_rounded,
+              color: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary,
+              size: 26,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Terakhir Dibaca',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.textSecondary,
+                    color: AppColors.subText(context),
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   'Surah $surahName : Ayat $ayatNomor',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: AppColors.text(context),
                   ),
                 ),
               ],
@@ -441,12 +445,12 @@ class _HomePageState extends ConsumerState<HomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Fitur Pilihan',
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: AppColors.text(context),
           ),
         ),
         const SizedBox(height: 12),
@@ -493,9 +497,9 @@ class _HomePageState extends ConsumerState<HomePage> {
 
         return Container(
           height: MediaQuery.of(context).size.height * 0.72,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          decoration: BoxDecoration(
+            color: AppColors.surface(context),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
             children: [
@@ -541,7 +545,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   ],
                 ),
               ),
-              const Divider(height: 1, color: AppColors.cardBorderLight),
+              Divider(height: 1, color: AppColors.cardBorder(context)),
               Expanded(
                 child: surahsAsync.when(
                   loading: () => const Center(
@@ -557,7 +561,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     return ListView.separated(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       itemCount: popularSurahs.length,
-                      separatorBuilder: (context, index) => const Divider(height: 1, color: AppColors.cardBorderLight),
+                      separatorBuilder: (context, index) => Divider(height: 1, color: AppColors.cardBorder(context)),
                       itemBuilder: (c, idx) {
                         final s = popularSurahs[idx];
                         final audioUrl = s.audioFull?[settings.qariId] ?? s.audioFull?['05'] ?? s.audioFull?['01'];
@@ -655,12 +659,12 @@ class _HomePageState extends ConsumerState<HomePage> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 6),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface(context),
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppColors.cardBorderLight),
+          border: Border.all(color: AppColors.cardBorder(context)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.02),
+              color: Colors.black.withValues(alpha: AppColors.isDark(context) ? 0.2 : 0.02),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),
@@ -684,10 +688,10 @@ class _HomePageState extends ConsumerState<HomePage> {
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: AppColors.text(context),
               ),
             ),
           ],
@@ -702,12 +706,12 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.cardBorderLight),
+        border: Border.all(color: AppColors.cardBorder(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: Colors.black.withValues(alpha: AppColors.isDark(context) ? 0.2 : 0.03),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -735,12 +739,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Ayat Pilihan',
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 15,
-                          color: AppColors.textPrimary,
+                          color: AppColors.text(context),
                         ),
                       ),
                       Row(
@@ -797,18 +801,18 @@ class _HomePageState extends ConsumerState<HomePage> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFFAFCFB),
+              color: AppColors.isDark(context) ? const Color(0xFF0F1A17) : const Color(0xFFFAFCFB),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFF0F4F2)),
+              border: Border.all(color: AppColors.cardBorder(context)),
             ),
             child: Text(
               dailyVerse.teksArab,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Amiri',
                 fontSize: 23,
                 fontWeight: FontWeight.w600,
                 height: 2.2,
-                color: Color(0xFF1B2A26),
+                color: AppColors.arabic(context),
               ),
               textAlign: TextAlign.right,
               textDirection: TextDirection.rtl,
@@ -831,10 +835,10 @@ class _HomePageState extends ConsumerState<HomePage> {
           // Terjemahan Bahasa Indonesia
           Text(
             '"${dailyVerse.terjemahan}"',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               height: 1.5,
-              color: AppColors.textSecondary,
+              color: AppColors.subText(context),
             ),
           ),
           const SizedBox(height: 14),

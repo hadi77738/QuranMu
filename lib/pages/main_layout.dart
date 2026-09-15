@@ -36,10 +36,10 @@ class MainLayout extends StatelessWidget {
                 children: [
                   const MiniAudioPlayer(),
                   Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
+                    decoration: BoxDecoration(
+                      color: AppColors.surface(context),
                       border: Border(
-                        top: BorderSide(color: AppColors.cardBorderLight, width: 1),
+                        top: BorderSide(color: AppColors.cardBorder(context), width: 1),
                       ),
                     ),
                     child: NavigationBar(

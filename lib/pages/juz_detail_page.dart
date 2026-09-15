@@ -11,7 +11,7 @@ import '../services/quran_service.dart';
 import '../services/audio_service.dart';
 import '../services/settings_service.dart';
 import '../theme/app_theme.dart';
-import 'surah_detail_page.dart' show MushafRuledLinesPainter;
+import '../components/mushaf_ruled_text.dart';
 
 class JuzDetailPage extends ConsumerStatefulWidget {
   final int juzNomor;
@@ -332,12 +332,12 @@ class _JuzDetailPageState extends ConsumerState<JuzDetailPage> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+        border: Border.all(color: (AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary).withValues(alpha: 0.3)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: Colors.black.withValues(alpha: AppColors.isDark(context) ? 0.2 : 0.02),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -349,16 +349,16 @@ class _JuzDetailPageState extends ConsumerState<JuzDetailPage> {
             width: 38,
             height: 38,
             decoration: BoxDecoration(
-              color: AppColors.primaryLight,
+              color: AppColors.isDark(context) ? const Color(0xFF0D4738) : AppColors.primaryLight,
               shape: BoxShape.circle,
-              border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
+              border: Border.all(color: (AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary).withValues(alpha: 0.4)),
             ),
             alignment: Alignment.center,
             child: Text(
               surah.nomor.toString(),
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w800,
-                color: AppColors.primary,
+                color: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary,
                 fontSize: 14,
               ),
             ),
@@ -370,26 +370,26 @@ class _JuzDetailPageState extends ConsumerState<JuzDetailPage> {
               children: [
                 Text(
                   'Surah ${surah.namaLatin}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
+                    color: AppColors.text(context),
                   ),
                 ),
                 Text(
                   '${surah.arti} • $rangeText',
-                  style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                  style: TextStyle(fontSize: 11, color: AppColors.subText(context)),
                 ),
               ],
             ),
           ),
           Text(
             surah.nama,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Amiri',
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: AppColors.primary,
+              color: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary,
             ),
             textDirection: TextDirection.rtl,
           ),
@@ -464,12 +464,12 @@ class _JuzDetailPageState extends ConsumerState<JuzDetailPage> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.cardBorderLight),
+        border: Border.all(color: AppColors.cardBorder(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.015),
+            color: Colors.black.withValues(alpha: AppColors.isDark(context) ? 0.2 : 0.015),
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),
@@ -482,7 +482,7 @@ class _JuzDetailPageState extends ConsumerState<JuzDetailPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: AppColors.backgroundLight.withValues(alpha: 0.5),
+              color: AppColors.isDark(context) ? const Color(0xFF0F1A17) : AppColors.backgroundLight.withValues(alpha: 0.5),
               borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
             ),
             child: Row(
@@ -491,16 +491,16 @@ class _JuzDetailPageState extends ConsumerState<JuzDetailPage> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryLight,
+                    color: AppColors.isDark(context) ? const Color(0xFF0D4738) : AppColors.primaryLight,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                    border: Border.all(color: (AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary).withValues(alpha: 0.3)),
                   ),
                   child: Text(
                     '${surah.nomor}:${ayat.nomorAyat}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w800,
+                    style: TextStyle(
                       fontSize: 11,
-                      color: AppColors.primary,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primaryDark,
                     ),
                   ),
                 ),
@@ -578,7 +578,7 @@ class _JuzDetailPageState extends ConsumerState<JuzDetailPage> {
                   fontSize: settings.arabicFontSize,
                   fontWeight: FontWeight.bold,
                   height: 2.2,
-                  color: const Color(0xFF1B2A26),
+                  color: AppColors.arabic(context),
                 ),
               ),
             ),
@@ -589,10 +589,10 @@ class _JuzDetailPageState extends ConsumerState<JuzDetailPage> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
               ayat.teksLatin,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontStyle: FontStyle.italic,
-                color: AppColors.primary,
+                color: AppColors.isDark(context) ? const Color(0xFF34D399) : AppColors.primary,
                 height: 1.4,
               ),
             ),
@@ -606,7 +606,7 @@ class _JuzDetailPageState extends ConsumerState<JuzDetailPage> {
               ayat.teksIndonesia,
               style: TextStyle(
                 fontSize: settings.translationFontSize,
-                color: AppColors.textPrimary,
+                color: AppColors.text(context),
                 height: 1.5,
               ),
             ),
@@ -630,12 +630,12 @@ class _JuzDetailPageState extends ConsumerState<JuzDetailPage> {
           // Bingkai Ganda Luar & Dalam Mushaf Standar Indonesia
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFFFCF9F0),
+              color: AppColors.isDark(context) ? const Color(0xFF111D19) : const Color(0xFFFCF9F0),
               border: Border.all(color: const Color(0xFFC89737), width: 2.5),
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
+                  color: Colors.black.withValues(alpha: AppColors.isDark(context) ? 0.2 : 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -644,7 +644,7 @@ class _JuzDetailPageState extends ConsumerState<JuzDetailPage> {
             padding: const EdgeInsets.all(4),
             child: Container(
               decoration: BoxDecoration(
-                border: Border.all(color: const Color(0xFF0D6E55), width: 1.5),
+                border: Border.all(color: AppColors.isDark(context) ? const Color(0xFF10B981) : const Color(0xFF0D6E55), width: 1.5),
                 borderRadius: BorderRadius.circular(12),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
@@ -685,11 +685,9 @@ class _JuzDetailPageState extends ConsumerState<JuzDetailPage> {
                     // Teks Bergaris per Surah
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
-                      child: CustomPaint(
-                        painter: MushafRuledLinesPainter(
-                          lineHeight: settings.arabicFontSize * 2.35,
-                          lineColor: const Color(0xFFE6DDC8),
-                        ),
+                      child: MushafRuledText(
+                        showLines: settings.showMushafLines,
+                        lineColor: AppColors.mushafLine(context),
                         child: RichText(
                           textAlign: TextAlign.justify,
                           textDirection: TextDirection.rtl,
@@ -707,7 +705,9 @@ class _JuzDetailPageState extends ConsumerState<JuzDetailPage> {
                                     fontSize: settings.arabicFontSize,
                                     fontWeight: isCurrentPlaying ? FontWeight.bold : FontWeight.w600,
                                     height: 2.35,
-                                    color: isCurrentPlaying ? const Color(0xFF0D6E55) : const Color(0xFF1B2A26),
+                                    color: isCurrentPlaying
+                                        ? (AppColors.isDark(context) ? const Color(0xFF34D399) : const Color(0xFF0D6E55))
+                                        : AppColors.arabic(context),
                                     backgroundColor: isCurrentPlaying ? const Color(0x3300BFA5) : null,
                                   ),
                                 ),
@@ -721,9 +721,13 @@ class _JuzDetailPageState extends ConsumerState<JuzDetailPage> {
                                       padding: const EdgeInsets.all(4),
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
-                                        color: isCurrentPlaying ? const Color(0xFFE0F2F1) : const Color(0xFFFAF6EB),
+                                        color: isCurrentPlaying
+                                            ? (AppColors.isDark(context) ? const Color(0xFF0D4738) : const Color(0xFFE0F2F1))
+                                            : (AppColors.isDark(context) ? const Color(0xFF1E2822) : const Color(0xFFFAF6EB)),
                                         border: Border.all(
-                                          color: isCurrentPlaying ? AppColors.primary : const Color(0xFFC89737),
+                                          color: isCurrentPlaying
+                                              ? (AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary)
+                                              : (AppColors.isDark(context) ? const Color(0xFFFFD54F) : const Color(0xFFC89737)),
                                           width: isCurrentPlaying ? 2.0 : 1.5,
                                         ),
                                       ),
@@ -733,7 +737,9 @@ class _JuzDetailPageState extends ConsumerState<JuzDetailPage> {
                                           fontFamily: 'Amiri',
                                           fontSize: 13,
                                           fontWeight: FontWeight.bold,
-                                          color: isCurrentPlaying ? AppColors.primary : const Color(0xFF0D6E55),
+                                          color: isCurrentPlaying
+                                              ? (AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary)
+                                              : (AppColors.isDark(context) ? const Color(0xFFFFD54F) : const Color(0xFF0D6E55)),
                                         ),
                                       ),
                                     ),
@@ -868,7 +874,7 @@ class _JuzDetailPageState extends ConsumerState<JuzDetailPage> {
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFFFAF7EE),
+        color: AppColors.isDark(context) ? const Color(0xFF182823) : const Color(0xFFFAF7EE),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFFC89737).withValues(alpha: 0.5)),
       ),
@@ -877,10 +883,10 @@ class _JuzDetailPageState extends ConsumerState<JuzDetailPage> {
         children: [
           Text(
             'Lanjutan Surah ${section.surah.namaLatin}',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF0D6E55),
+              color: AppColors.isDark(context) ? const Color(0xFF10B981) : const Color(0xFF0D6E55),
             ),
           ),
           Text(
@@ -901,18 +907,18 @@ class _JuzDetailPageState extends ConsumerState<JuzDetailPage> {
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFFFAF7EE),
+        color: AppColors.isDark(context) ? const Color(0xFF182823) : const Color(0xFFFAF7EE),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFFC89737).withValues(alpha: 0.4)),
       ),
-      child: const Center(
+      child: Center(
         child: Text(
           'بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ',
           style: TextStyle(
             fontFamily: 'Amiri',
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0D6E55),
+            color: AppColors.isDark(context) ? const Color(0xFF10B981) : const Color(0xFF0D6E55),
           ),
           textDirection: TextDirection.rtl,
         ),

@@ -61,12 +61,12 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface(context),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.cardBorderLight),
+                border: Border.all(color: AppColors.cardBorder(context)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.02),
+                    color: Colors.black.withValues(alpha: AppColors.isDark(context) ? 0.2 : 0.02),
                     blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
@@ -104,17 +104,18 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
             child: Container(
               height: 46,
               decoration: BoxDecoration(
-                color: const Color(0xFFEAEFEB),
+                color: AppColors.isDark(context) ? const Color(0xFF13201C) : const Color(0xFFEAEFEB),
                 borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppColors.cardBorder(context)),
               ),
               child: TabBar(
                 controller: _tabController,
                 indicator: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
-                  color: AppColors.primary,
+                  color: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.3),
+                      color: (AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary).withValues(alpha: 0.3),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
@@ -123,7 +124,7 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
                 indicatorSize: TabBarIndicatorSize.tab,
                 dividerColor: Colors.transparent,
                 labelColor: Colors.white,
-                unselectedLabelColor: AppColors.textSecondary,
+                unselectedLabelColor: AppColors.subText(context),
                 labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
                 unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
                 tabs: const [
@@ -193,12 +194,12 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
   Widget _buildSurahTile(Surah surah) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.cardBorderLight),
+        border: Border.all(color: AppColors.cardBorder(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.015),
+            color: Colors.black.withValues(alpha: AppColors.isDark(context) ? 0.2 : 0.015),
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),
@@ -220,17 +221,17 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: AppColors.primaryContainer,
+                    color: AppColors.isDark(context) ? const Color(0xFF0D4738) : AppColors.primaryContainer,
                     shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+                    border: Border.all(color: (AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary).withValues(alpha: 0.2)),
                   ),
                   alignment: Alignment.center,
                   child: Text(
                     surah.nomor.toString(),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w800,
                       fontSize: 13,
-                      color: AppColors.primary,
+                      color: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary,
                     ),
                   ),
                 ),
@@ -243,10 +244,10 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
                     children: [
                       Text(
                         surah.namaLatin,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 15,
-                          color: AppColors.textPrimary,
+                          color: AppColors.text(context),
                         ),
                       ),
                       const SizedBox(height: 3),
@@ -256,8 +257,8 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
                               color: surah.tempatTurun.toLowerCase() == 'mekah'
-                                  ? const Color(0xFFFFF3D6)
-                                  : const Color(0xFFE2F3ED),
+                                  ? (AppColors.isDark(context) ? const Color(0xFF3E2D0D) : const Color(0xFFFFF3D6))
+                                  : (AppColors.isDark(context) ? const Color(0xFF0D4738) : const Color(0xFFE2F3ED)),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
@@ -266,8 +267,8 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
                                 fontSize: 10,
                                 fontWeight: FontWeight.w700,
                                 color: surah.tempatTurun.toLowerCase() == 'mekah'
-                                    ? const Color(0xFFB57C1E)
-                                    : AppColors.primary,
+                                    ? (AppColors.isDark(context) ? const Color(0xFFFFD54F) : const Color(0xFFB57C1E))
+                                    : (AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary),
                               ),
                             ),
                           ),
@@ -276,9 +277,9 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
                             '${surah.jumlahAyat} Ayat • ${surah.arti}',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
-                              color: AppColors.textSecondary,
+                              color: AppColors.subText(context),
                             ),
                           ),
                         ],
@@ -290,11 +291,11 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
                 // Teks Kaligrafi Arab
                 Text(
                   surah.nama,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Amiri',
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
+                    color: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary,
                   ),
                   textDirection: TextDirection.rtl,
                 ),
@@ -322,12 +323,12 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
   Widget _buildJuzTile(Juz juz) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.cardBorderLight),
+        border: Border.all(color: AppColors.cardBorder(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.015),
+            color: Colors.black.withValues(alpha: AppColors.isDark(context) ? 0.2 : 0.015),
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),
@@ -349,17 +350,17 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: AppColors.secondaryLight,
+                    color: AppColors.isDark(context) ? const Color(0xFF3E2D0D) : AppColors.secondaryLight,
                     shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.secondary.withValues(alpha: 0.3)),
+                    border: Border.all(color: (AppColors.isDark(context) ? const Color(0xFFFFD54F) : AppColors.secondary).withValues(alpha: 0.3)),
                   ),
                   alignment: Alignment.center,
                   child: Text(
                     juz.nomor.toString(),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w800,
                       fontSize: 13,
-                      color: AppColors.onSecondary,
+                      color: AppColors.isDark(context) ? const Color(0xFFFFD54F) : AppColors.onSecondary,
                     ),
                   ),
                 ),
@@ -372,10 +373,10 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
                     children: [
                       Text(
                         'Juz ${juz.nomor}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 15,
-                          color: AppColors.textPrimary,
+                          color: AppColors.text(context),
                         ),
                       ),
                       const SizedBox(height: 3),
@@ -383,9 +384,9 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
                         juz.rangeDescription,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textSecondary,
+                          color: AppColors.subText(context),
                         ),
                       ),
                     ],
@@ -395,11 +396,11 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
                 // Awal Bacaan Arab
                 Text(
                   juz.namaArabic,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Amiri',
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
+                    color: AppColors.arabic(context),
                   ),
                   textDirection: TextDirection.rtl,
                 ),

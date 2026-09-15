@@ -9,6 +9,9 @@ import '../services/quran_service.dart';
 import '../services/audio_service.dart';
 import '../services/settings_service.dart';
 import '../theme/app_theme.dart';
+import '../components/mushaf_ruled_text.dart';
+
+export '../components/mushaf_ruled_text.dart';
 
 class SurahDetailPage extends ConsumerStatefulWidget {
   final int surahNomor;
@@ -258,12 +261,12 @@ class _SurahDetailPageState extends ConsumerState<SurahDetailPage> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.cardBorderLight),
+        border: Border.all(color: AppColors.cardBorder(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.015),
+            color: Colors.black.withValues(alpha: AppColors.isDark(context) ? 0.2 : 0.015),
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),
@@ -277,7 +280,7 @@ class _SurahDetailPageState extends ConsumerState<SurahDetailPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: const Color(0xFFF7FAF8),
+              color: AppColors.isDark(context) ? const Color(0xFF0F1A17) : const Color(0xFFF7FAF8),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -288,17 +291,17 @@ class _SurahDetailPageState extends ConsumerState<SurahDetailPage> {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: AppColors.primaryContainer,
+                    color: AppColors.isDark(context) ? const Color(0xFF0D4738) : AppColors.primaryContainer,
                     shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+                    border: Border.all(color: (AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary).withValues(alpha: 0.2)),
                   ),
                   alignment: Alignment.center,
                   child: Text(
                     '${ayat.nomorAyat}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
-                      color: AppColors.primary,
+                      color: AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary,
                     ),
                   ),
                 ),
@@ -383,7 +386,7 @@ class _SurahDetailPageState extends ConsumerState<SurahDetailPage> {
               fontSize: settings.arabicFontSize,
               fontWeight: FontWeight.w600,
               height: 2.2,
-              color: const Color(0xFF1B2A26),
+              color: AppColors.arabic(context),
             ),
             textAlign: TextAlign.right,
             textDirection: TextDirection.rtl,
@@ -393,10 +396,10 @@ class _SurahDetailPageState extends ConsumerState<SurahDetailPage> {
           // Transliterasi Latin
           Text(
             ayat.teksLatin,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontStyle: FontStyle.italic,
-              color: AppColors.primary,
+              color: AppColors.isDark(context) ? const Color(0xFF34D399) : AppColors.primary,
               height: 1.4,
             ),
           ),
@@ -407,7 +410,7 @@ class _SurahDetailPageState extends ConsumerState<SurahDetailPage> {
             ayat.teksIndonesia,
             style: TextStyle(
               fontSize: settings.translationFontSize,
-              color: AppColors.textPrimary,
+              color: AppColors.text(context),
               height: 1.5,
             ),
           ),
@@ -429,12 +432,12 @@ class _SurahDetailPageState extends ConsumerState<SurahDetailPage> {
           // Frame Utama Mushaf Standar Indonesia (Bingkai Ganda Emas & Zamrud)
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFFFDFBF5),
+              color: AppColors.isDark(context) ? const Color(0xFF111D19) : const Color(0xFFFDFBF5),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: const Color(0xFFC89737), width: 2.5),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
+                  color: Colors.black.withValues(alpha: AppColors.isDark(context) ? 0.2 : 0.04),
                   blurRadius: 10,
                   offset: const Offset(0, 3),
                 ),
@@ -444,7 +447,7 @@ class _SurahDetailPageState extends ConsumerState<SurahDetailPage> {
               margin: const EdgeInsets.all(4.5),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFF0D6E55), width: 1.2),
+                border: Border.all(color: AppColors.isDark(context) ? const Color(0xFF10B981) : const Color(0xFF0D6E55), width: 1.2),
               ),
               child: Column(
                 children: [
@@ -453,7 +456,7 @@ class _SurahDetailPageState extends ConsumerState<SurahDetailPage> {
                     margin: const EdgeInsets.all(12),
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF4F8F5),
+                      color: AppColors.isDark(context) ? const Color(0xFF182823) : const Color(0xFFF4F8F5),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: const Color(0xFFC89737), width: 1.5),
                     ),
@@ -500,21 +503,21 @@ class _SurahDetailPageState extends ConsumerState<SurahDetailPage> {
                   // 2. Ornamen Bismillah
                   if (surah.nomor != 1 && surah.nomor != 9)
                     Container(
-                      margin: const EdgeInsets.only(left: 24, right: 24, bottom: 12),
-                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                      margin: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFAF7EE),
+                        color: AppColors.isDark(context) ? const Color(0xFF182823) : const Color(0xFFFCF9EE),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(color: const Color(0xFFC89737).withValues(alpha: 0.4)),
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Text(
                           'بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ',
                           style: TextStyle(
                             fontFamily: 'Amiri',
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF0D6E55),
+                            color: AppColors.isDark(context) ? const Color(0xFF10B981) : const Color(0xFF0D6E55),
                           ),
                           textDirection: TextDirection.rtl,
                         ),
@@ -524,11 +527,9 @@ class _SurahDetailPageState extends ConsumerState<SurahDetailPage> {
                   // 3. Teks Al-Qur'an Bergaris (Mushaf Bergaris Standar Indonesia)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 8.0),
-                    child: CustomPaint(
-                      painter: MushafRuledLinesPainter(
-                        lineHeight: settings.arabicFontSize * 2.35,
-                        lineColor: const Color(0xFFE6DDC8),
-                      ),
+                    child: MushafRuledText(
+                      showLines: settings.showMushafLines,
+                      lineColor: AppColors.mushafLine(context),
                       child: RichText(
                         textAlign: TextAlign.justify,
                         textDirection: TextDirection.rtl,
@@ -546,7 +547,9 @@ class _SurahDetailPageState extends ConsumerState<SurahDetailPage> {
                                   fontSize: settings.arabicFontSize,
                                   fontWeight: isCurrentPlaying ? FontWeight.bold : FontWeight.w600,
                                   height: 2.35,
-                                  color: isCurrentPlaying ? const Color(0xFF0D6E55) : const Color(0xFF1B2A26),
+                                  color: isCurrentPlaying
+                                      ? (AppColors.isDark(context) ? const Color(0xFF34D399) : const Color(0xFF0D6E55))
+                                      : AppColors.arabic(context),
                                   backgroundColor: isCurrentPlaying ? const Color(0x3300BFA5) : null,
                                 ),
                               ),
@@ -565,9 +568,13 @@ class _SurahDetailPageState extends ConsumerState<SurahDetailPage> {
                                     padding: const EdgeInsets.all(4),
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: isCurrentPlaying ? const Color(0xFFE0F2F1) : const Color(0xFFFAF6EB),
+                                      color: isCurrentPlaying
+                                          ? (AppColors.isDark(context) ? const Color(0xFF0D4738) : const Color(0xFFE0F2F1))
+                                          : (AppColors.isDark(context) ? const Color(0xFF1E2822) : const Color(0xFFFAF6EB)),
                                       border: Border.all(
-                                        color: isCurrentPlaying ? AppColors.primary : const Color(0xFFC89737),
+                                        color: isCurrentPlaying
+                                            ? (AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary)
+                                            : (AppColors.isDark(context) ? const Color(0xFFFFD54F) : const Color(0xFFC89737)),
                                         width: isCurrentPlaying ? 2.0 : 1.5,
                                       ),
                                       boxShadow: [
@@ -584,7 +591,9 @@ class _SurahDetailPageState extends ConsumerState<SurahDetailPage> {
                                         fontFamily: 'Amiri',
                                         fontSize: 13,
                                         fontWeight: FontWeight.bold,
-                                        color: isCurrentPlaying ? AppColors.primary : const Color(0xFF0D6E55),
+                                        color: isCurrentPlaying
+                                            ? (AppColors.isDark(context) ? const Color(0xFF10B981) : AppColors.primary)
+                                            : (AppColors.isDark(context) ? const Color(0xFFFFD54F) : const Color(0xFF0D6E55)),
                                       ),
                                     ),
                                   ),

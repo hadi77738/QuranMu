@@ -9,8 +9,10 @@ import 'pages/settings_page.dart';
 import 'pages/surah_detail_page.dart';
 import 'pages/qibla_page.dart';
 import 'pages/doa_page.dart';
+import 'pages/tahlil_page.dart';
 import 'pages/juz_detail_page.dart';
 import 'services/notification_service.dart';
+import 'services/settings_service.dart';
 import 'theme/app_theme.dart';
 
 void main() async {
@@ -77,6 +79,10 @@ final _router = GoRouter(
           builder: (context, state) => const DoaPage(),
         ),
         GoRoute(
+          path: '/tahlil',
+          builder: (context, state) => const TahlilPage(),
+        ),
+        GoRoute(
           path: '/juz/:id',
           builder: (context, state) {
             final id = int.tryParse(state.pathParameters['id'] ?? '1') ?? 1;
@@ -88,17 +94,25 @@ final _router = GoRouter(
   ],
 );
 
-class QuranMuApp extends StatelessWidget {
+class QuranMuApp extends ConsumerWidget {
   const QuranMuApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(settingsProvider);
+
+    final themeMode = switch (settings.themeMode) {
+      AppThemeMode.dark => ThemeMode.dark,
+      AppThemeMode.light => ThemeMode.light,
+      AppThemeMode.system => ThemeMode.system,
+    };
+
     return MaterialApp.router(
       title: 'QuranMu',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.light, // Default light, nanti bisa dikontrol lewat Riverpod settings
+      themeMode: themeMode,
       routerConfig: _router,
     );
   }

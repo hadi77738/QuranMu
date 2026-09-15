@@ -6,6 +6,8 @@ class DoaItem {
   final String teksLatin;
   final String arti;
   final String riwayat;
+  final int? count;
+  final int? urutan;
 
   const DoaItem({
     required this.id,
@@ -15,5 +17,7 @@ class DoaItem {
     required this.teksLatin,
     required this.arti,
     required this.riwayat,
+    this.count,
+    this.urutan,
   });
 }

@@ -317,6 +317,69 @@ class NotificationService {
       }
     }
   }
+
+  /// Menjadwalkan alarm uji coba (misal 5 detik kemudian)
+  Future<void> scheduleTestAlarm({
+    required int id,
+    required String title,
+    required String body,
+    required DateTime scheduledTime,
+    String? soundFile,
+  }) async {
+    await init();
+    if (!_platformAvailable) return;
+    final tzScheduled = tz.TZDateTime.from(scheduledTime, tz.local);
+    AndroidNotificationDetails androidNotificationDetails;
+    if (soundFile != null && soundFile.isNotEmpty && soundFile != 'default') {
+      androidNotificationDetails = AndroidNotificationDetails(
+        'quranmu_adzan_${soundFile}_v2',
+        'Pengingat Adzan (${soundFile.replaceAll('_', ' ').toUpperCase()})',
+        channelDescription: 'Notifikasi jadwal masuk waktu sholat dengan kumandang adzan',
+        importance: Importance.max,
+        priority: Priority.high,
+        playSound: true,
+        sound: RawResourceAndroidNotificationSound(soundFile),
+        audioAttributesUsage: AudioAttributesUsage.notificationRingtone,
+        enableVibration: true,
+        icon: '@mipmap/ic_launcher',
+        category: AndroidNotificationCategory.alarm,
+        visibility: NotificationVisibility.public,
+      );
+    } else {
+      androidNotificationDetails = const AndroidNotificationDetails(
+        'quranmu_prayer_channel_v2',
+        'Pengingat Waktu Sholat',
+        channelDescription: 'Notifikasi jadwal masuk waktu sholat & adzan',
+        importance: Importance.max,
+        priority: Priority.high,
+        playSound: true,
+        enableVibration: true,
+        icon: '@mipmap/ic_launcher',
+        category: AndroidNotificationCategory.alarm,
+        visibility: NotificationVisibility.public,
+      );
+    }
+    final details = NotificationDetails(android: androidNotificationDetails);
+    try {
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        id: id,
+        title: title,
+        body: body,
+        scheduledDate: tzScheduled,
+        notificationDetails: details,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      );
+    } catch (_) {
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        id: id,
+        title: title,
+        body: body,
+        scheduledDate: tzScheduled,
+        notificationDetails: details,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      );
+    }
+  }
 }
 
 // Provider untuk sinkronisasi otomatis jadwal notifikasi sholat

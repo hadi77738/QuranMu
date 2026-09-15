@@ -73,12 +73,12 @@ class _QiblaPageState extends ConsumerState<QiblaPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surface(context),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.cardBorderLight),
+                  border: Border.all(color: AppColors.cardBorder(context)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.02),
+                      color: Colors.black.withValues(alpha: AppColors.isDark(context) ? 0.2 : 0.02),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
@@ -101,11 +101,11 @@ class _QiblaPageState extends ConsumerState<QiblaPage> {
                         children: [
                           Text(
                             location.locationName,
-                            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppColors.text(context)),
                           ),
                           Text(
                             '${location.latitude.toStringAsFixed(4)}°, ${location.longitude.toStringAsFixed(4)}°',
-                            style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                            style: TextStyle(fontSize: 12, color: AppColors.subText(context)),
                           ),
                         ],
                       ),
@@ -246,16 +246,16 @@ class _QiblaPageState extends ConsumerState<QiblaPage> {
                               height: 260,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.white,
+                                color: AppColors.surface(context),
                                 border: Border.all(
-                                  color: isFacingKaabah ? AppColors.primary : AppColors.cardBorderLight,
+                                  color: isFacingKaabah ? AppColors.primary : AppColors.cardBorder(context),
                                   width: isFacingKaabah ? 3 : 2,
                                 ),
                                 boxShadow: [
                                   BoxShadow(
                                     color: isFacingKaabah
                                         ? AppColors.primary.withValues(alpha: 0.2)
-                                        : Colors.black.withValues(alpha: 0.05),
+                                        : Colors.black.withValues(alpha: AppColors.isDark(context) ? 0.3 : 0.05),
                                     blurRadius: 20,
                                     offset: const Offset(0, 8),
                                   ),
@@ -269,17 +269,17 @@ class _QiblaPageState extends ConsumerState<QiblaPage> {
                                     top: 12,
                                     child: Text('U', style: TextStyle(fontWeight: FontWeight.w900, color: Colors.red, fontSize: 16)),
                                   ),
-                                  const Positioned(
+                                  Positioned(
                                     bottom: 12,
-                                    child: Text('S', style: TextStyle(fontWeight: FontWeight.w700, color: AppColors.textSecondary, fontSize: 14)),
+                                    child: Text('S', style: TextStyle(fontWeight: FontWeight.w700, color: AppColors.subText(context), fontSize: 14)),
                                   ),
-                                  const Positioned(
+                                  Positioned(
                                     right: 12,
-                                    child: Text('T', style: TextStyle(fontWeight: FontWeight.w700, color: AppColors.textSecondary, fontSize: 14)),
+                                    child: Text('T', style: TextStyle(fontWeight: FontWeight.w700, color: AppColors.subText(context), fontSize: 14)),
                                   ),
-                                  const Positioned(
+                                  Positioned(
                                     left: 12,
-                                    child: Text('B', style: TextStyle(fontWeight: FontWeight.w700, color: AppColors.textSecondary, fontSize: 14)),
+                                    child: Text('B', style: TextStyle(fontWeight: FontWeight.w700, color: AppColors.subText(context), fontSize: 14)),
                                   ),
                                   // Tick marks
                                   for (int i = 0; i < 12; i++)
@@ -291,7 +291,7 @@ class _QiblaPageState extends ConsumerState<QiblaPage> {
                                           margin: const EdgeInsets.only(top: 32),
                                           width: 1.5,
                                           height: 8,
-                                          color: Colors.grey.shade300,
+                                          color: AppColors.isDark(context) ? Colors.white24 : Colors.grey.shade300,
                                         ),
                                       ),
                                     ),
@@ -365,7 +365,9 @@ class _QiblaPageState extends ConsumerState<QiblaPage> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryContainer.withValues(alpha: 0.5),
+                  color: AppColors.isDark(context)
+                      ? AppColors.primary.withValues(alpha: 0.15)
+                      : AppColors.primaryContainer.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
                 ),
@@ -373,10 +375,14 @@ class _QiblaPageState extends ConsumerState<QiblaPage> {
                   children: [
                     const Icon(Icons.info_outline_rounded, color: AppColors.primary, size: 22),
                     const SizedBox(width: 12),
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         'Posisikan ponsel mendatar di tempat terbuka jauh dari casing bermagnet atau benda logam untuk akurasi terbaik sensor.',
-                        style: TextStyle(fontSize: 12, height: 1.5, color: AppColors.onPrimaryContainer),
+                        style: TextStyle(
+                          fontSize: 12,
+                          height: 1.5,
+                          color: AppColors.isDark(context) ? AppColors.text(context) : AppColors.onPrimaryContainer,
+                        ),
                       ),
                     ),
                   ],
@@ -421,8 +427,8 @@ class _QiblaPageState extends ConsumerState<QiblaPage> {
               height: 260,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white,
-                border: Border.all(color: AppColors.cardBorderLight, width: 2),
+                color: AppColors.surface(context),
+                border: Border.all(color: AppColors.cardBorder(context), width: 2),
               ),
               child: const Stack(
                 alignment: Alignment.center,

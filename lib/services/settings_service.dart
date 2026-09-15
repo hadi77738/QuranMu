@@ -1,5 +1,24 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'notification_service.dart';
+
+enum AppThemeMode {
+  light,
+  dark,
+  system;
+
+  String get label {
+    switch (this) {
+      case AppThemeMode.light:
+        return 'Terang';
+      case AppThemeMode.dark:
+        return 'Gelap';
+      case AppThemeMode.system:
+        return 'Sistem';
+    }
+  }
+}
 
 class AppSettings {
   final double arabicFontSize;
@@ -14,6 +33,8 @@ class AppSettings {
   final bool alertIsya;
   final String adzanSound; // 'adzan_makkah', 'adzan_madinah', 'adzan_mesir', 'default'
   final String adzanSoundName;
+  final bool showMushafLines;
+  final AppThemeMode themeMode;
 
   const AppSettings({
     this.arabicFontSize = 24.0,
@@ -28,6 +49,8 @@ class AppSettings {
     this.alertIsya = true,
     this.adzanSound = 'adzan_makkah',
     this.adzanSoundName = 'Adzan Makkah (Merdu & Syahdu)',
+    this.showMushafLines = true,
+    this.themeMode = AppThemeMode.light,
   });
 
   AppSettings copyWith({
@@ -43,6 +66,8 @@ class AppSettings {
     bool? alertIsya,
     String? adzanSound,
     String? adzanSoundName,
+    bool? showMushafLines,
+    AppThemeMode? themeMode,
   }) {
     return AppSettings(
       arabicFontSize: arabicFontSize ?? this.arabicFontSize,
@@ -57,6 +82,8 @@ class AppSettings {
       alertIsya: alertIsya ?? this.alertIsya,
       adzanSound: adzanSound ?? this.adzanSound,
       adzanSoundName: adzanSoundName ?? this.adzanSoundName,
+      showMushafLines: showMushafLines ?? this.showMushafLines,
+      themeMode: themeMode ?? this.themeMode,
     );
   }
 }
@@ -70,6 +97,13 @@ class SettingsNotifier extends Notifier<AppSettings> {
 
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
+    final themeStr = prefs.getString('setting_theme_mode');
+    final loadedTheme = themeStr == 'dark'
+        ? AppThemeMode.dark
+        : themeStr == 'system'
+            ? AppThemeMode.system
+            : AppThemeMode.light;
+
     state = AppSettings(
       arabicFontSize: prefs.getDouble('setting_arabic_font') ?? 24.0,
       translationFontSize: prefs.getDouble('setting_translation_font') ?? 14.0,
@@ -83,7 +117,29 @@ class SettingsNotifier extends Notifier<AppSettings> {
       alertIsya: prefs.getBool('setting_notif_isya') ?? true,
       adzanSound: prefs.getString('setting_adzan_sound') ?? 'adzan_makkah',
       adzanSoundName: prefs.getString('setting_adzan_sound_name') ?? 'Adzan Makkah (Merdu & Syahdu)',
+      showMushafLines: prefs.getBool('setting_show_mushaf_lines') ?? true,
+      themeMode: loadedTheme,
     );
+  }
+
+  Future<void> setThemeMode(AppThemeMode mode) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('setting_theme_mode', mode.name);
+    state = state.copyWith(themeMode: mode);
+    _notifyWidgetThemeChanged();
+  }
+
+  void _notifyWidgetThemeChanged() {
+    try {
+      const MethodChannel('com.quranmu.pacman/widget')
+          .invokeMethod('updateWidgetTheme');
+    } catch (_) {}
+  }
+
+  Future<void> setMushafLines(bool show) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('setting_show_mushaf_lines', show);
+    state = state.copyWith(showMushafLines: show);
   }
 
   Future<void> setAdzanSound(String sound, String name) async {
@@ -142,6 +198,22 @@ class SettingsNotifier extends Notifier<AppSettings> {
         state = state.copyWith(alertIsya: enabled);
         break;
     }
+  }
+
+  Future<void> scheduleTestAlarm({
+    required int id,
+    required String title,
+    required String body,
+    required DateTime scheduledTime,
+    String? soundFile,
+  }) async {
+    await NotificationService().scheduleTestAlarm(
+      id: id,
+      title: title,
+      body: body,
+      scheduledTime: scheduledTime,
+      soundFile: soundFile,
+    );
   }
 }
 
