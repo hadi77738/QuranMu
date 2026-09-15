@@ -369,7 +369,20 @@ class SettingsPage extends ConsumerWidget {
                       icon: const Icon(Icons.volume_up_rounded, size: 20),
                       label: const Text('Tes Notifikasi Adzan Sekarang'),
                       onPressed: () async {
-                        await NotificationService().showNotification(
+                        final notifService = NotificationService();
+                        final granted = await notifService.requestPermission();
+                        if (!granted && context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Izin notifikasi belum diaktifkan di sistem HP. Silakan aktifkan izin notifikasi untuk QuranMu di Pengaturan HP Anda.'),
+                              backgroundColor: Colors.deepOrange,
+                              duration: Duration(seconds: 4),
+                            ),
+                          );
+                          return;
+                        }
+
+                        await notifService.showNotification(
                           id: 999,
                           title: 'Waktu Sholat Telah Tiba',
                           body: 'Panggilan adzan (${settings.adzanSoundName}) telah berkumandang. Mari tunaikan sholat.',
@@ -378,8 +391,9 @@ class SettingsPage extends ConsumerWidget {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Notifikasi tes berhasil dikirim dengan suara ${settings.adzanSoundName}!'),
-                              duration: const Duration(seconds: 2),
+                              content: Text('Notifikasi tes berhasil dikirim (${settings.adzanSoundName})! Silakan periksa bilah notifikasi HP Anda.'),
+                              duration: const Duration(seconds: 3),
+                              backgroundColor: AppColors.primary,
                             ),
                           );
                         }

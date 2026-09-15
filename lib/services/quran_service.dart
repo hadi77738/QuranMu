@@ -8,6 +8,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/surah.dart';
 import '../models/surah_detail.dart';
 import '../models/tafsir_ayat.dart';
+import '../models/ayat.dart';
+import '../models/juz.dart';
+import '../data/juz_data.dart';
 
 enum ReadingMode {
   translation, // Mode Ayat + Terjemahan
@@ -159,6 +162,85 @@ class QuranService {
 
     return [];
   }
+
+  Future<JuzDetail> getJuzDetail(int juzNomor) async {
+    final juz = allJuzList.firstWhere(
+      (j) => j.nomor == juzNomor,
+      orElse: () => allJuzList.first,
+    );
+
+    final surahFutures = <Future<SurahDetail>>[];
+    for (int surahNum = juz.startSurahNomor; surahNum <= juz.endSurahNomor; surahNum++) {
+      surahFutures.add(getSurahDetail(surahNum));
+    }
+    final surahDetails = await Future.wait(surahFutures);
+
+    final List<JuzSection> sections = [];
+    for (int i = 0; i < surahDetails.length; i++) {
+      final surahDetail = surahDetails[i];
+      final surahNum = juz.startSurahNomor + i;
+
+      int fromAyat = 1;
+      int toAyat = surahDetail.jumlahAyat;
+      bool isStartOfSurah = true;
+      bool isEndOfSurah = true;
+
+      if (surahNum == juz.startSurahNomor) {
+        fromAyat = juz.startAyat;
+        if (fromAyat > 1) {
+          isStartOfSurah = false;
+        }
+      }
+
+      if (surahNum == juz.endSurahNomor) {
+        toAyat = juz.endAyat;
+        if (toAyat < surahDetail.jumlahAyat) {
+          isEndOfSurah = false;
+        }
+      }
+
+      final filtered = surahDetail.ayatList
+          .where((a) => a.nomorAyat >= fromAyat && a.nomorAyat <= toAyat)
+          .toList();
+
+      if (filtered.isNotEmpty) {
+        sections.add(JuzSection(
+          surah: surahDetail,
+          ayatList: filtered,
+          isStartOfSurah: isStartOfSurah,
+          isEndOfSurah: isEndOfSurah,
+        ));
+      }
+    }
+
+    return JuzDetail(juz: juz, sections: sections);
+  }
+}
+
+class JuzSection {
+  final SurahDetail surah;
+  final List<Ayat> ayatList;
+  final bool isStartOfSurah;
+  final bool isEndOfSurah;
+
+  const JuzSection({
+    required this.surah,
+    required this.ayatList,
+    required this.isStartOfSurah,
+    required this.isEndOfSurah,
+  });
+}
+
+class JuzDetail {
+  final Juz juz;
+  final List<JuzSection> sections;
+
+  const JuzDetail({
+    required this.juz,
+    required this.sections,
+  });
+
+  int get totalAyat => sections.fold<int>(0, (sum, sec) => sum + sec.ayatList.length);
 }
 
 // Service Provider
@@ -184,6 +266,13 @@ final surahTafsirProvider =
     FutureProvider.family<List<TafsirAyat>, int>((ref, nomor) async {
   final service = ref.watch(quranServiceProvider);
   return service.getSurahTafsir(nomor);
+});
+
+// FutureProvider Family untuk Detail Juz (memuat seluruh surah & ayat dalam Juz)
+final juzDetailProvider =
+    FutureProvider.family<JuzDetail, int>((ref, juzNomor) async {
+  final service = ref.watch(quranServiceProvider);
+  return service.getJuzDetail(juzNomor);
 });
 
 // Notifier Mode Baca (Terjemahan vs Mushaf Murni)

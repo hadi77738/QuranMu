@@ -12,7 +12,7 @@ class MainLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String location = GoRouterState.of(context).uri.path;
-    final bool isSubPage = location.startsWith('/quran/') || location == '/qibla' || location == '/doa';
+    final bool isSubPage = location.startsWith('/quran/') || location.startsWith('/juz/') || location == '/qibla' || location == '/doa';
     final bool isMainTab = location == '/quran' || location == '/settings';
     final selectedIndex = _calculateSelectedIndex(context);
 

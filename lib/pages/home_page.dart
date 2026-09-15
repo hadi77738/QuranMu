@@ -7,6 +7,7 @@ import '../services/prayer_service.dart';
 import '../services/quran_service.dart';
 import '../services/audio_service.dart';
 import '../services/settings_service.dart';
+import '../services/notification_service.dart';
 import '../theme/app_theme.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -17,6 +18,14 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      NotificationService().requestPermission();
+    });
+  }
+
   String _formatDuration(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     final hours = twoDigits(duration.inHours);
@@ -27,6 +36,9 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // Sinkronkan notifikasi jadwal sholat otomatis saat settings/lokasi diperbarui
+    ref.watch(prayerNotificationSyncProvider);
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(

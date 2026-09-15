@@ -7,6 +7,8 @@ import 'package:quranmu/pages/surah_detail_page.dart';
 import 'package:quranmu/pages/qibla_page.dart';
 import 'package:quranmu/pages/settings_page.dart';
 import 'package:quranmu/pages/doa_page.dart';
+import 'package:quranmu/pages/juz_detail_page.dart';
+import 'package:quranmu/data/juz_data.dart';
 import 'package:quranmu/services/prayer_service.dart';
 
 void main() {
@@ -136,6 +138,35 @@ void main() {
     await tester.pump();
     expect(find.byTooltip('Mode Lanskap'), findsOneWidget);
     expect(find.byTooltip('Ganti ke Mode Mushaf'), findsOneWidget);
+  });
+
+  testWidgets('JuzDetailPage renders for Juz 1', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(
+          home: JuzDetailPage(juzNomor: 1),
+        ),
+      ),
+    );
+
+    await tester.pump();
+    expect(find.byType(JuzDetailPage), findsOneWidget);
+  });
+
+  test('All 30 Juz coverage and surah range integrity', () {
+    expect(allJuzList.length, 30);
+    expect(allJuzList.first.startSurahNomor, 1);
+    expect(allJuzList.first.startAyat, 1);
+    expect(allJuzList.last.endSurahNomor, 114);
+    expect(allJuzList.last.endAyat, 6);
+
+    for (int i = 0; i < allJuzList.length; i++) {
+      final juz = allJuzList[i];
+      expect(juz.nomor, i + 1);
+      expect(juz.startSurahNomor, lessThanOrEqualTo(juz.endSurahNomor));
+      expect(juz.startAyat, greaterThanOrEqualTo(1));
+      expect(juz.endAyat, greaterThanOrEqualTo(1));
+    }
   });
 }
 

@@ -9,6 +9,7 @@ import 'pages/settings_page.dart';
 import 'pages/surah_detail_page.dart';
 import 'pages/qibla_page.dart';
 import 'pages/doa_page.dart';
+import 'pages/juz_detail_page.dart';
 import 'services/notification_service.dart';
 import 'theme/app_theme.dart';
 
@@ -74,6 +75,13 @@ final _router = GoRouter(
         GoRoute(
           path: '/doa',
           builder: (context, state) => const DoaPage(),
+        ),
+        GoRoute(
+          path: '/juz/:id',
+          builder: (context, state) {
+            final id = int.tryParse(state.pathParameters['id'] ?? '1') ?? 1;
+            return JuzDetailPage(juzNomor: id);
+          },
         ),
       ],
     ),

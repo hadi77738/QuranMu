@@ -338,8 +338,7 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () {
-            final startSurah = _getSurahNomorForJuz(juz);
-            context.push('/quran/$startSurah');
+            context.push('/juz/${juz.nomor}');
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
@@ -410,14 +409,5 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
         ),
       ),
     );
-  }
-
-  int _getSurahNomorForJuz(Juz juz) {
-    const juzStartMap = {
-      1: 1, 2: 2, 3: 2, 4: 3, 5: 4, 6: 4, 7: 5, 8: 6, 9: 7, 10: 8,
-      11: 9, 12: 11, 13: 12, 14: 15, 15: 17, 16: 18, 17: 21, 18: 23, 19: 25, 20: 27,
-      21: 29, 22: 33, 23: 36, 24: 39, 25: 41, 26: 46, 27: 51, 28: 58, 29: 67, 30: 78,
-    };
-    return juzStartMap[juz.nomor] ?? 1;
   }
 }
